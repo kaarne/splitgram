@@ -42,24 +42,23 @@ def handle(update, context):
     chat_id = update.effective_chat.id
     user = update.effective_user.first_name
 
-    command = parse_message(update.effective_message.text)
+    added_cost = parse_message(update.effective_message.text)
 
     print("chat_id", chat_id)
     print("user", user)
-    print("command", command)
+    print("added_cost", added_cost)
 
-    if (command is not None):
-        current = context.chat_data.get('state')
-        if (current is None):
-            current = {}
-            current['users'] = {}
-            current['users'][user] = float(0)
+    if (added_cost is not None):
+        if (context.chat_data.get('state') is None):
+            context.chat_data['state'] = {}
+            context.chat_data['state']['users'] = {}
+            context.chat_data['state']['users'][user] = float(0)
 
         # TODO: limit to 2 decimals
-        updated = current['users'][user] + command
-        context.chat_data['state']['users'][user] = updated
+        context.chat_data['state']['users'][user] += added_cost
 
         results = split_costs(context.chat_data['state']['users'])
+
         context.bot.sendMessage(chat_id, results)
     else:
         context.bot.sendMessage(chat_id, 'oops :(')
@@ -77,7 +76,7 @@ def main():
     dp.add_handler(CommandHandler("reset", reset))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(MessageHandler(Filters.text, handle))
-    dp.add_error_handler(error)
+    #dp.add_error_handler(error)
 
     updater.start_polling()
 
