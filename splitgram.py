@@ -8,18 +8,21 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+# TODO:
+DEBUG = True
+
 def start(update, context):
     update.message.reply_text('Terve!')
 
 def reset(update, context):
-    context.chat_data['state'] = { "users": dict() }
-    update.message.reply_text('reset done')
+    context.chat_data['state'] = { 'payments': dict() }
+    update.message.reply_text('Reset done')
 
 def status(update, context):
     update.message.reply_text(context.chat_data['state'])
 
 def help(update, context):
-    update.message.reply_text('sorry, no help')
+    update.message.reply_text('Sorry, no help')
 
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
@@ -108,39 +111,48 @@ def split_costs(costs):
 
 def handle(update, context):
     chat_id = update.effective_chat.id
-    user = update.effective_user.first_name
+    user_id = update.effective_user.id
 
-    # for debugging purposes only
-    if True:
-       arr = update.effective_message.text.split(" ")
-       if len(arr) > 1:
-           user = arr[1]
+    if DEBUG:
+        # In debug mode, first name is used as user id, and you can fake
+        # multiple users by typing a name after the amount, e.g '19.99 Bob'
+        arr = update.effective_message.text.split(" ")
+        user_id = update.effective_user.first_name
+        if len(arr) > 1:
+            user_id = arr[1]
 
     added_cost = parse_message(update.effective_message.text)
 
     if (added_cost is not None):
         if 'state' not in context.chat_data:
-            context.chat_data['state'] = { "users": dict() }
+            context.chat_data['state'] = { 'payments': dict() }
 
-        if user not in context.chat_data['state']['users']:
-            context.chat_data['state']['users'][user] = float(0)
+        if user_id not in context.chat_data['state']['payments']:
+            context.chat_data['state']['payments'][user_id] = float(0)
 
-        new_costs = context.chat_data['state']['users'][user] + added_cost
+        new_costs = context.chat_data['state']['payments'][user_id] + added_cost
         if new_costs < 0:
             new_costs = 0
-        context.chat_data['state']['users'][user] = new_costs
+        context.chat_data['state']['payments'][user_id] = new_costs
 
-        results = split_costs(context.chat_data['state']['users'])
+        results = split_costs(context.chat_data['state']['payments'])
 
-        messages = []
+        status_strings = []
         for debtor in results:
             for creditor, amount in results[debtor].items():
-                messages.append(debtor + ' owes ' + creditor + ' ' + str(round(amount, 2)) + ' €')
-
-        context.bot.sendMessage(chat_id, '\n'.join(messages) or user + ' is the only participant so far')
-
+                if DEBUG:
+                    debtor_name = debtor
+                    creditor_name = creditor
+                else:
+                    debtor_name = context.bot.get_chat_member(chat_id, debtor)
+                    creditor_name = context.bot.get_chat_member(chat_id, creditor)
+                status_strings.append(debtor_name + ' owes ' + creditor_name + ' ' + str(round(amount, 2)) + ' €')
+        reply_message = '\n'.join(status_strings) or 'No one owes anything!'
     else:
-        context.bot.sendMessage(chat_id, 'oops :(')
+        reply_message = "Oops!"
+
+    context.bot.sendMessage(chat_id, reply_message)
+
 
 def main():
     TOKEN = sys.argv[1]
