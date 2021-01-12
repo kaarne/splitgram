@@ -15,9 +15,14 @@ $ pipenv install
 $ pipenv run python splitgram.py YOUR_TELEGRAM_TOKEN
 ```
 
+Run unit tests:
+```
+$ pipenv run pytest
+```
+
 ## Usage
 
-When the bot is present in a Telegram chat, and any user sends a message consisting only of an integer or decimal number, the bot interprets this value as a payment that the user in question has made. The user is not considered as part of the cost splitting until he/she has messaged at least one value (if you want to join cost splitting without adding any value, just send 0). After every added value, the bot prints out the current state of the costs. It is recommended that a dedicated chat is created for the cost splitting purposes, so that no values are accidentally added during regular conversation. 
+When the bot is present in a Telegram chat, and a user sends a message consisting only of an integer or decimal number, the bot interprets this value as a payment that this user has made. The user is not considered as part of the cost splitting until he/she has messaged at least one value (if you want to join cost splitting without adding any value, just send 0). After every added value, the bot prints out the current state of the costs. It is recommended that a dedicated chat is created for the cost splitting purposes, so that no values are accidentally added during regular conversation. 
 
 Example status message:
 
