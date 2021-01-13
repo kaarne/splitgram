@@ -26,18 +26,20 @@ When the bot is present in a Telegram chat, and a user sends a message consistin
 
 Example status message:
 
-Lala owes Lulu 75.0 €<br/>
-Nana owes Lulu 50.0 €<br/>
+```
+Lala owes Lulu 75.0 €
+Nana owes Lulu 50.0 €
 Nana owes Momo 75.0 €
+```
 
 In addition, the following commands are available:
 
 **/reset** Reset the state<br/>
-**/status** Print the current status
+**/status** Print the current status<br/>
+**/language** Set user language, pass the language string as a parameter (supported: en, de, fi)
 
-## Todo
-
-- Optionally limit users participating in a single cost by enabling tagging users in a cost message.
-- Don't force disabling privacy mode by letting users also add costs via a command (e.g. /add 19.90) if that is what they prefer. The original reason for not enabling this is ease of use: it is much faster to write a single value **50**, instead of **/add 50** or **@botName 50**.
-- Localisation
+## To Do
+- Allow limiting users participating in a single cost (maybe by enabling tagging users in a cost message).
+- Don't force disabling privacy mode by letting users also add costs via a command (e.g. /add 19.90) if that is what they prefer. The original reason for not implementing this is ease of use: it is much faster to write a single value **50**, instead of **/add 50** or **@botName 50**.
+- Webhooks support
 - Improve performance by implementing concurrency.
