@@ -22,7 +22,7 @@ $ pipenv run pytest
 
 ## Usage
 
-When the bot is present in a Telegram chat, and a user sends a message consisting only of an integer or decimal number, the bot interprets this value as a payment that this user has made. The user is not considered as part of the cost splitting until he/she has messaged at least one value (if you want to join cost splitting without adding any value, just send 0). After every added value, the bot prints out the current state of the costs. It is recommended that a dedicated chat is created for the cost splitting purposes, so that no values are accidentally added during regular conversation. 
+When the bot is present in a Telegram chat, and a user sends a message consisting only of an integer or decimal number, the bot interprets this value as a payment that is added to user's total costs. The user is not considered as part of the cost splitting until he/she has messaged at least one value (if you want to join cost splitting without adding any value, just send 0). After every added value, the bot prints out the current state of the costs. It is recommended that a dedicated chat is created for the cost splitting purposes, so that no values are accidentally added during regular conversation. 
 
 Example status message:
 
@@ -40,6 +40,6 @@ In addition, the following commands are available:
 
 ## To Do
 - Allow limiting users participating in a single cost (maybe by enabling tagging users in a cost message).
-- Don't force disabling privacy mode by letting users also add costs via a command (e.g. /add 19.90) if that is what they prefer. The original reason for not implementing this is ease of use: it is much faster to write a single value **50**, instead of **/add 50** or **@botName 50**.
+- Don't force disabling privacy mode by letting users also add costs via a command (e.g. /add 19.90) if that is what they prefer. The original reason for not implementing this is ease of use: it is much faster to write a single value '50', instead of '/add 50' or '@botName 50'.
 - Webhooks support
 - Improve performance by implementing concurrency.
