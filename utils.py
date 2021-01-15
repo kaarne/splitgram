@@ -8,64 +8,36 @@ def parse_message(message):
 
 
 def split_costs(costs):
-    user_count = len(costs)
+    if len(costs) == 0:
+        return {}
 
-    # init diffs
-    diffs = costs.copy()
-    for d_index in diffs:
-        diffs.update({d_index: 0})
+    results = dict()
+    creditors = []
+    debtors = []
+    cost_per_user = sum(costs.values()) / len(costs)
 
-    # calculate a sum of all diffs for all users
-    for c_index in costs:
-        cost = costs[c_index]
-        if cost > 0:
-            per_user = cost / user_count
-            for d_index in diffs:
-                diff = diffs[d_index]
-                if d_index == c_index:
-                    new_diff = float(diff) + float(cost) - per_user
-                    diffs.update({d_index: new_diff})
-                else:
-                    new_diff = float(diff) - per_user
-                    diffs.update({d_index: new_diff})
+    for user, value in costs.items():
+        if value < cost_per_user:
+            debtors.append({'user': user, 'value': cost_per_user - value})
+            results[user] = dict()
+        elif value > cost_per_user:
+            creditors.append({'user': user, 'value': value - cost_per_user})
 
-    # find all debtors and creditors
-    debtors = {}
-    creditors = {}
-    for d_index in diffs:
-        diff = diffs[d_index]
-        if diff < 0:
-            debtors[d_index] = diff
-        elif diff > 0:
-            creditors[d_index] = diff
-
-    final_debtors = {}
-    for debt_index in debtors:
-        tmp_creditors = {}
-        for credit_index in creditors:
-            debt = abs(debtors[debt_index])
-            credit = creditors[credit_index]
-            if debt == credit:
-                creditors.update({credit_index: 0})
-                tmp_creditors[credit_index] = credit
-                final_debtors[debt_index] = tmp_creditors
-                break
-            elif debt < credit:
-                creditors.update({credit_index: credit - debt})
-                tmp_creditors[credit_index] = debt
-                final_debtors[debt_index] = tmp_creditors
-                break
-            else:
-                creditors.update({credit_index: 0})
-                debtors.update({debt_index: debt - credit})
-                tmp_creditors[credit_index] = credit
-                final_debtors[debt_index] = tmp_creditors
-
-        if debtors[debt_index] == 0:
-            break
-
-    # filter out 0 debts
-    for debtor in final_debtors:
-        final_debtors[debtor] = dict(filter(lambda elem: elem[1] > 0, final_debtors[debtor].items()))
-
-    return final_debtors
+    for debtor in debtors:
+        for creditor in creditors:
+            if creditor['value'] > 0:
+                remaining = creditor['value'] - debtor['value']
+                if remaining == 0:
+                    results[debtor['user']][creditor['user']] = creditor['value']
+                    creditor['value'] = 0
+                    break
+                elif remaining < 0:
+                    results[debtor['user']][creditor['user']] = creditor['value']
+                    creditor['value'] = 0
+                    debtor['value'] = abs(remaining)
+                    continue
+                else:  # remaining > 0
+                    results[debtor['user']][creditor['user']] = debtor['value']
+                    creditor['value'] -= debtor['value']
+                    break
+    return results
