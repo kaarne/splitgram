@@ -1,16 +1,21 @@
 from utils import parse_message, split_costs
 
 
-def test_parse_invalid():
+def test_parse():
+    assert parse_message(None) is None
     assert parse_message('lorem') is None
+    assert parse_message('lorem 19.99') is None
+    assert parse_message('99999') is None
+    assert parse_message('-99999') is None
+    assert parse_message(1) is None
 
-
-def test_parse_valid():
     assert parse_message('19.99') == 19.99
+    assert parse_message('19,99') == 19.99
     assert parse_message('19.99 lorem') == 19.99
 
 
-def test_split_costs():
+def test_split():
+    assert split_costs(None) == {}
     assert split_costs({}) == {}
     assert split_costs({'a': 0, 'b': 0}) == {}
     assert split_costs({'a': 10, 'b': 0}) == {'b': {'a': 5}}

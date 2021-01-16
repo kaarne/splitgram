@@ -36,6 +36,16 @@ def set_language(update, context):
 def error(update, context):
     logger.warning('update {}, err {}'.format(update, context.error))
 
+# potentially needed in the future
+def get_tagged_users(update):
+    tagged_users = [update.effective_user.id]
+    for entity in update.effective_message.entities:
+        if entity.type == 'text_mention':
+            if entity.user.id not in tagged_users:
+                tagged_users.append(entity.user.id)
+    if len(tagged_users) > 1:
+        return tagged_users.sort()
+    return []
 
 def handle(update, context):
     chat_id = update.effective_chat.id
@@ -75,8 +85,8 @@ def handle(update, context):
                     debtor_name = debtor
                     creditor_name = creditor
                 else:
-                    debtor_name = context.bot.get_chat_member(chat_id, debtor)
-                    creditor_name = context.bot.get_chat_member(chat_id, creditor)
+                    debtor_name = context.bot.get_chat_member(chat_id, debtor).user.first_name
+                    creditor_name = context.bot.get_chat_member(chat_id, creditor).user.first_name
                 status_strings.append(_t(context, 'status').format(debtor_name, creditor_name, str(round(amount, 2))))
         reply_message = '\n'.join(status_strings) or _t(context, 'even')
     else:

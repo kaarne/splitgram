@@ -1,14 +1,18 @@
 def parse_message(message):
-    amount = message.split(" ")[0]
+    if type(message) is not str:
+        return None
     try:
+        amount = message.split(' ')[0].replace(',', '.')
         result = float(amount)
+        if result > 10000 or result < -10000:
+            return None
         return result
     except ValueError:
         return None
 
 
 def split_costs(costs):
-    if len(costs) == 0:
+    if costs is None or len(costs) == 0:
         return {}
 
     results = dict()
