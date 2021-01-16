@@ -1,5 +1,5 @@
 def parse_message(message):
-    if type(message) is not str:
+    if type(message) != str:
         return None
     try:
         amount = message.split(' ')[0].replace(',', '.')
